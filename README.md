@@ -39,7 +39,7 @@ Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na ent
 *Obrázok 1 Entitno-relačná schéma BikeSales*
 ***
 
-## 2. Dimenzionálny model
+## 2. Návrh dimenzionálneho modelu
 
 
 
