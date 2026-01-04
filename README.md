@@ -35,7 +35,7 @@ Zdrojové dáta z Snowflake Marketplace sú uložené v relačných tabuľkách.
 
 
 <div align="center">
-  <img src="" alt="ERD">
+  <img src="img/erd_schema.png" alt="ERD">
   <p><i>Obrázok 1 Entitno-relačná schéma BikeSales</i></p>
 </div>
 
@@ -341,8 +341,11 @@ DROP TABLE IF EXISTS PRODUCTSUBCATEGORY_STAGING;
 
 ## 4. Vizualizácia dát
 ...
-(img)
-*Obrázok 3 Dashboard BikeSales datasetu*
+<div align="center">
+  <img src="img/bikesales_dashboard.png" alt="ERD">
+  <p><i>Obrázok 3 Dashboard BikeSales datasetu</i></p>
+</div>
+
 ***
 ### Graf 1: (názov)
 (opis)
