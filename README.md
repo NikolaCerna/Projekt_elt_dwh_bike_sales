@@ -418,6 +418,8 @@ JOIN dim_geography g ON f.geography_id = g.geography_id
 GROUP BY g.customer_country
 ORDER BY total_quantity_sold DESC;
 ```
+
+Dashboard poskytuje ucelený pohľad na predaj bicyklov z viacerých perspektív – časovej, produktovej, demografickej aj geografickej. Vizualizácie umožňujú rýchlu interpretáciu dát a slúžia ako základ pre ďalšiu analytickú prácu, reporting alebo rozhodovanie v oblasti predaja a marketingu.
 ***
 Autorky: Nikola Černá a Sára Dzurechová
 
