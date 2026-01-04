@@ -340,36 +340,84 @@ DROP TABLE IF EXISTS PRODUCTSUBCATEGORY_STAGING;
 ***
 
 ## 4. Vizualizácia dát
-...
+Dashboard obsahuje 6 vizualizácií, ktoré poskytujú prehľad o vývoji predaja bicyklov, správaní zákazníkov a rozdieloch medzi produktmi, časom a regiónmi. Vizualizácie odpovedajú na dôležité analytické otázky a vychádzajú z dát uložených v dimenzionálnom modeli typu Star Schema.
+
+Každý graf je vytvorený na základe SQL dotazu nad faktovou tabuľkou fact_sales a príslušnými dimenziami.
+
 <div align="center">
   <img src="img/bikesales_dashboard.png" alt="ERD">
   <p><i>Obrázok 3 Dashboard BikeSales datasetu</i></p>
 </div>
 
 ***
-### Graf 1: (názov)
-(opis)
-`kod`
+### Graf 1: Tržby podľa mesiacov
+Graf znázorňuje, ako sa celkové tržby z predaja bicyklov rozdeľujú počas jednotlivých mesiacov v roku. Vizualizácia umožňuje identifikovať sezónnosť predaja a zistiť, v ktorých mesiacoch dochádza k vyšším alebo nižším tržbám.
+Z grafu je viditeľné, že predaj bicyklov má výrazne sezónny charakter, pričom vyššie tržby sa dosahujú najmä v jarných a letných mesiacoch.
+```
+SELECT d.month, SUM(f.sales_amount) AS total_sales_amount FROM fact_sales f
+JOIN dim_date d ON f.date_id = d.date_id
+GROUP BY d.month
+ORDER BY d.month;
+```
 ***
-### Graf 2: (názov)
-(opis)
-`kod`
+### Graf 2: Vývoj tržieb v čase (podľa rokov)
+
+Táto vizualizácia zobrazuje celkové tržby z predaja bicyklov v jednotlivých rokoch. Slúži na sledovanie dlhodobého trendu vývoja predaja v čase.
+Graf umožňuje porovnať jednotlivé roky medzi sebou a identifikovať obdobia rastu alebo poklesu tržieb, čo môže súvisieť s dopytom, ekonomickou situáciou alebo zmenami v ponuke produktov.
+```
+SELECT d.year, SUM(f.sales_amount) AS total_sales_amount FROM fact_sales f
+JOIN dim_date d ON f.date_id = d.date_id
+GROUP BY d.year
+ORDER BY d.year;
+```
 ***
-### Graf 3: (názov)
-(opis)
-`kod`
+### Graf 3: Top 10 najpredávanejších produktov (podľa počtu kusov)
+
+Graf zobrazuje 10 produktov, ktoré sa predali v najväčšom množstve. Na rozdiel od tržieb je tu metrikou počet predaných kusov, čo umožňuje identifikovať najobľúbenejšie produkty bez ohľadu na ich cenu.
+Vizualizácia ukazuje, ktoré modely bicyklov sú medzi zákazníkmi najviac žiadané.
+```
+SELECT p.product_name, SUM(order_quantity) AS total_quantity FROM fact_sales f
+JOIN dim_products p ON f.products_id = p.products_id
+GROUP BY p.product_name
+ORDER BY total_quantity DESC
+LIMIT 10;
+```
 ***
-### Graf 4: (názov)
-(opis)
-`kod`
+### Graf 4: Top 8 hodín s najvyšším počtom predaných kusov
+
+Tento graf znázorňuje, počas ktorých hodín v priebehu dňa dochádza k najvyššiemu počtu predaných produktov. Vizualizácia umožňuje analyzovať nákupné správanie zákazníkov z časového hľadiska.
+Z výsledkov je možné pozorovať, že predaj je koncentrovaný do určitých hodín dňa, čo môže súvisieť s pracovnou dobou alebo voľným časom zákazníkov.
+```
+SELECT t.hour, SUM(f.order_quantity) AS total_quantity_sold FROM fact_sales f
+JOIN dim_time t ON f.time_id = t.time_id
+GROUP BY t.hour
+ORDER BY total_quantity_sold DESC
+LIMIT 8;
+```
 ***
-### Graf 5: (názov)
-(opis)
-`kod`
+### Graf 5: Predaj cestných bicyklov podľa pohlavia zákazníkov
+
+Graf porovnáva počet predaných cestných bicyklov medzi jednotlivými pohlaviami zákazníkov. Umožňuje analyzovať, či existujú rozdiely v preferenciách medzi mužmi a ženami pri tomto type produktu.
+Vizualizácia ukazuje, že cestné bicykle sú obľúbené u oboch pohlaví, pričom rozdiely v počte predaných kusov nie sú výrazné.
+```
+SELECT c.gender, SUM(f.order_quantity) AS total_quantity_sold FROM fact_sales f
+JOIN dim_customers c ON f.customers_id = c.customers_id
+JOIN dim_products p ON p.products_id=f.products_id
+WHERE p.category LIKE 'Road Bikes'
+GROUP BY c.gender
+ORDER BY total_quantity_sold DESC;
+```
 ***
-### Graf 6: (názov)
-(opis)
-`kod`
+### Graf 6: Počet predaných produktov podľa krajín
+
+Táto vizualizácia zobrazuje rozdelenie predaja bicyklov podľa krajín. Umožňuje porovnať jednotlivé geografické oblasti a identifikovať regióny s najvyšším dopytom po bicykloch.
+Graf poskytuje prehľad o tom, v ktorých krajinách sa bicykle predávajú najviac a kde má predaj najväčší potenciál.
+```
+SELECT  g.customer_country, SUM(f.order_quantity) AS total_quantity_sold FROM fact_sales f
+JOIN dim_geography g ON f.geography_id = g.geography_id
+GROUP BY g.customer_country
+ORDER BY total_quantity_sold DESC;
+```
 ***
 Autorky: Nikola Černá a Sára Dzurechová
 
