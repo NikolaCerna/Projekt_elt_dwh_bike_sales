@@ -1,49 +1,89 @@
 # 1. Úvod a popis zdrojových dát
 
-V tomto projekte sa zameriavame na analýzu predaja bicyklov v rôznych regiónoch a časoch. Vybrali sme si tento dataset, pretože je prehľadný, jednoduchý na pochopenie a dá sa dobre analyzovať podľa produktov, regiónov aj času.
+V tomto projekte sa venujeme analýze predaja bicyklov v rôznych časových obdobiach a geografických oblastiach. Zvolený dataset sme si vybrali najmä preto, že je prehľadný, ľahko pochopiteľný a vhodný na analýzu z pohľadu času, produktov aj regiónov.
 
-Dáta ukazujú, ako prebieha predaj bicyklov – zaznamenávajú jednotlivé predaje, informácie o produktoch, zákazníkoch, miestach predaja a finančné údaje. Pomáhajú nám sledovať, aké bicykle sa predávajú najviac, ktoré regióny majú najlepší predaj a ako sa predaje menia v čase.
+Dáta zachytávajú celý proces predaja bicyklov – od jednotlivých predajných záznamov až po informácie o produktoch, zákazníkoch, miestach predaja a finančných ukazovateľoch. Vďaka tomu je možné sledovať vývoj predaja, porovnávať úspešnosť jednotlivých produktov a analyzovať rozdiely medzi regiónmi.
 
-Dataset obsahuje rôzne typy údajov: časové (dátum predaja), produktové (typ a kategória bicykla), geografické (kde sa predaj uskutočnil) a číselné (tržby, počet predaných kusov, zisk).
+Dataset obsahuje viacero typov údajov, konkrétne časové údaje (dátum predaja), produktové údaje (typ a kategória bicykla), geografické údaje (miesto predaja) a číselné údaje, ako sú tržby, množstvo predaných kusov a zisk.
 
-Analýza bude hlavne zameraná na:
-* sledovanie predaja bicyklov v čase
-* zistenie najpredávanejších produktov a kategórií
-* porovnanie predaja medzi rôznymi regiónmi
-* sledovanie trendov v tržbách a zisku
+Cieľom analýzy je najmä:
+* sledovať, ako sa predaj bicyklov vyvíja v čase,
+* identifikovať najpredávanejšie produkty a kategórie,
+* porovnať predaje medzi jednotlivými regiónmi,
+* analyzovať trendy v tržbách a zisku.
 
-Dáta pochádzajú zo Snowflake Marketplace, konkrétne z datasetu [Bike Sales – Sample Dashboard Synthetic Data](https://app.snowflake.com/marketplace/listing/GZ1M7Z2XJQI/astrato-bike-sales-sample-dashboard-synthetic-data?search=sales).
+Zdrojové dáta pochádzajú zo Snowflake Marketplace, konkrétne z datasetu [Bike Sales – Sample Dashboard Synthetic Data](https://app.snowflake.com/marketplace/listing/GZ1M7Z2XJQI/astrato-bike-sales-sample-dashboard-synthetic-data?search=sales), ktorý obsahuje viacero tabuliek reprezentujúcich jednotlivé časti predajného procesu.
 
-Dataset obsahuje niekoľko tabuliek:
-* SALES – údaje o jednotlivých predajoch, ako dátum, ID produktu, ID zákazníka, región, množstvo, tržby a zisk. Toto bude základ pre faktovú tabuľku.
-* PRODUCTS – informácie o bicykloch, názov, kategória a podkategória. Slúži na dimenziu produktov.
-* CUSTOMERS – info o zákazníkoch (ID, meno, segment). Slúži na dimenziu zákazníkov.
-* GEOGRAPHY – údaje o regiónoch predaja (mestá, krajiny). Slúži na dimenziu regiónov.
-* PRODUCTSUBCATEGORY – kategórie a podkategórie bicyklov, pomáhajú rozšíriť produktovú dimenziu.
+Dataset zahŕňa tieto tabuľky:
+* `SALES` – obsahuje záznamy o jednotlivých predajoch vrátane dátumu, produktu, zákazníka, regiónu, množstva a finančných ukazovateľov. Táto tabuľka slúži ako základ pre faktovú tabuľku.
+* `PRODUCTS` – obsahuje informácie o bicykloch, ako sú názov, kategória a ďalšie vlastnosti. Je zdrojom pre dimenziu produktov.
+* `CUSTOMERS` – zahŕňa základné informácie o zákazníkoch a slúži na vytvorenie dimenzie zákazníkov.
+* `GEOGRAPHY` – obsahuje geografické údaje o miestach predaja (napríklad mestá a krajiny), ktoré sú použité v dimenzii geografie.
+* `PRODUCTSUBCATEGORY` – obsahuje produktové kategórie, ktoré rozširujú informácie v produktovej dimenzii.
 
-Cieľom ELT procesu je tieto dáta získať zo Snowflake Marketplace, upraviť ich do dimenzionálneho modelu typu hviezda a pripraviť na analýzu a vizualizácie, aby sme mohli jednoducho sledovať predaje z rôznych uhlov pohľadu.
+Úlohou ELT procesu je tieto dáta prevziať zo Snowflake Marketplace, následne ich transformovať do dimenzionálneho modelu typu hviezda a pripraviť ich na analytické spracovanie a vizualizáciu z rôznych uhlov pohľadu.
 
 ***
 
 ### 1.1 Dátová architektúra
 ### ERD diagram
-Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na entitno-relačnom diagrame (ERD):
+Zdrojové dáta z Snowflake Marketplace sú uložené v relačných tabuľkách. Ich základnú štruktúru a vzťahy medzi jednotlivými tabuľkami znázorňuje nasledujúci entitno-relačný diagram:
 
 
 
 
 
 
+<div align="center">
+  <img src="" alt="ERD">
+  <p><i>Obrázok 1 Entitno-relačná schéma BikeSales</i></p>
+</div>
 
-
-*Obrázok 1 Entitno-relačná schéma BikeSales*
 ***
 
 ## 2. Návrh dimenzionálneho modelu
 
+Na základe pôvodnej štruktúry zdrojových dát bol navrhnutý dimenzionálny model typu Star Schema, ktorý vychádza z Kimballovej metodológie. Model je postavený tak, aby bol vhodný na analytické spracovanie dát a umožňoval jednoduché dotazovanie nad predajmi bicyklov.
 
+Model pozostáva z jednej centrálnej faktovej tabuľky `fact_sales`, ktorá je prepojená s viacerými dimenziami. Takéto usporiadanie zjednodušuje analýzu dát a zvyšuje prehľadnosť celého dátového skladu.
 
+#### 2.1 Faktová tabuľka
 
+Tabuľka `fact_sales` zachytáva jednotlivé položky objednávok, teda každý predaný produkt v rámci objednávky.
+Primárnym kľúčom tabuľky je `sales_id`. Tabuľka obsahuje cudzie kľúče na dimenzie `dim_date`, `dim_time`, `dim_customers`, `dim_products` a `dim_geography`.
+
+Faktová tabuľka obsahuje najmä číselné údaje potrebné na analýzu predaja, napríklad:
+* počet predaných kusov,
+* jednotkovú cenu produktu,
+* výšku zľavy,
+* výslednú sumu predaja,
+* daň a náklady na dopravu.
+
+Súčasťou faktovej tabuľky sú aj window functions, ktoré umožňujú rozšírené analytické výpočty:
+* výpočet celkovej hodnoty objednávky pomocou `SUM() OVER (PARTITION BY salesordernumber)`,
+* výpočet kumulatívnej hodnoty predaja pre jednotlivých zákazníkov v čase pomocou `SUM() OVER (PARTITION BY customerkey ORDER BY orderdate)`.
+
+#### 2.2 Dimenzie
+
+Faktová tabuľka je prepojená s nasledujúcimi dimenziami:
+* `dim_date` – obsahuje informácie o dátume predaja, ako je deň, mesiac, rok, štvrťrok a deň v týždni.
+    * SCD Typ 0 – hodnoty v tejto dimenzii sa nemenia.
+
+* `dim_time` – umožňuje analyzovať predaje podľa presného času (hodina, minúta, sekunda).
+    * SCD Typ 0 – časová dimenzia je nemenná.
+
+* `dim_customers` – obsahuje základné údaje o zákazníkoch a ich priradenie k geografickej oblasti.
+    * SCD Typ 1 – zmeny údajov sa neukladajú historicky.
+
+* `dim_products` – obsahuje informácie o bicykloch, ich vlastnostiach a produktových kategóriách.
+    * SCD Typ 1 – uchováva sa iba aktuálny stav produktu.
+
+* `dim_geography` – obsahuje geografické informácie o mieste predaja, ako sú mesto, štát a krajina.
+    * SCD Typ 1 - historické zmeny geografických údajov sa neukladajú.
+
+Všetky dimenzie sú prepojené s faktovou tabuľkou vzťahom 1 : N pomocou surrogate kľúčov, čo umožňuje jednoduché a efektívne vytváranie analytických dotazov.
+
+Schéma hviezdy a prepojenia medzi jednotlivými tabuľkami sú znázornené na diagrame nižšie:
 
 
 <div align="center">
@@ -53,51 +93,71 @@ Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na ent
 
 ***
 ## 3. ELT proces v Snowflake
-...
-...
-...
-### 3.1 Extract a load
-...
-...
-#### Kód:
+ELT proces v tomto projekte pozostáva z troch hlavných krokov: `Extract` (extrahovanie), `Load` (načítanie) a `Transform` (transformácia). Dáta sú spracovávané priamo v prostredí Snowflake bez potreby externých súborov, keďže zdrojové dáta pochádzajú zo Snowflake Marketplace.
+***
+### 3.1 Extract a load (Extrahovanie a načítanie dát)
+#### Extract
+V kroku Extract sú dáta získané zo Snowflake Marketplace. Konkrétne ide o dataset [Bike Sales – Sample Dashboard Synthetic Data](https://app.snowflake.com/marketplace/listing/GZ1M7Z2XJQI/astrato-bike-sales-sample-dashboard-synthetic-data?search=sales), ktorý je dostupný v databáze:
+* databáza: `BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA`
+* schéma: `BIKES_SALES`
+
+Dáta sú extrahované priamo pomocou SQL príkazov `SELECT` a uložené do staging tabuliek, ktoré slúžia ako dočasná vrstva pre ďalšie spracovanie dát.
+
+#### Load
+V rovnakom kroku sú extrahované dáta zároveň načítané (loaded) do staging tabuliek v databáze projektu. Každá zdrojová tabuľka z Marketplace má svoju zodpovedajúcu staging tabuľku.
+Staging tabuľky:
+* `SALES_STAGING`
+* `PRODUCTS_STAGING`
+* `CUSTOMERS_STAGING`
+* `GEOGRAPHY_STAGING`
+* `PRODUCTSUBCATEGORY_STAGING`
+
+Tieto tabuľky obsahujú nezmenené (surové) dáta zo zdrojového datasetu. V tejto fáze nedochádza k žiadnym úpravám dát, ide len o presnú kópiu zdrojových tabuliek.
+
+#### Použité SQL príkazy:
 ```sql
 CREATE OR REPLACE TABLE SALES_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."1_SALES";
 
-DESCRIBE TABLE SALES_STAGING;
-SELECT * FROM SALES_STAGING;
-
 CREATE OR REPLACE TABLE PRODUCTS_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."11_PRODUCTS";
-
-DESCRIBE TABLE PRODUCTS_STAGING;
-SELECT * FROM PRODUCTS_STAGING;
 
 CREATE OR REPLACE TABLE CUSTOMERS_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."2_CUSTOMERS";
 
-DESCRIBE TABLE CUSTOMERS_STAGING;
-SELECT * FROM CUSTOMERS_STAGING;
-
 CREATE OR REPLACE TABLE GEOGRAPHY_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."3_GEOGRAPHY";
 
-DESCRIBE TABLE GEOGRAPHY_STAGING;
-SELECT * FROM GEOGRAPHY_STAGING;
-
 CREATE OR REPLACE TABLE PRODUCTSUBCATEGORY_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."5_PRODUCTSUBCATEGORY";
+
+```
+Po ich vytvorení sú dáta overené pomocou príkazov `DESCRIBE TABLE` a `SELECT`, čím sa zabezpečí, že boli načítané správne:
+```sql
+DESCRIBE TABLE SALES_STAGING;
+SELECT * FROM SALES_STAGING;
+
+DESCRIBE TABLE PRODUCTS_STAGING;
+SELECT * FROM PRODUCTS_STAGING;
+
+DESCRIBE TABLE CUSTOMERS_STAGING;
+SELECT * FROM CUSTOMERS_STAGING;
+
+DESCRIBE TABLE GEOGRAPHY_STAGING;
+SELECT * FROM GEOGRAPHY_STAGING;
 
 DESCRIBE TABLE PRODUCTSUBCATEGORY_STAGING;
 SELECT * FROM PRODUCTSUBCATEGORY_STAGING;
 ```
 
 
-
 ### 3.2 Transform (Transformácia dát)
-...
-...
-#### Príklad kódu 
+V transformačnej fáze boli dáta zo staging tabuliek upravené a preusporiadané do dimenzionálneho modelu typu Star Schema. Cieľom tejto fázy bolo pripraviť prehľadné dimenzie a faktovú tabuľku, ktoré umožnia jednoduchú analytickú prácu nad predajmi bicyklov.
+
+Transformácia prebiehala priamo v prostredí Snowflake pomocou SQL príkazov. Počas tohto kroku boli dáta čistené, deduplikované, typovo upravené (casting) a rozdelené do samostatných dimenzií a faktovej tabuľky.
+***
+#### Dimenzia dátumu (dim_date)
+Dimenzia `dim_date` bola vytvorená zo stĺpca orderdate v tabuľke `sales_staging`. Obsahuje odvodené časové atribúty, ako sú deň, mesiac, rok, štvrťrok a názov dňa v týždni. Použitím `SELECT DISTINCT` sa zabezpečilo, že každý dátum sa v dimenzii nachádza iba raz.
 ```sql
 CREATE OR REPLACE TABLE dim_date AS
 SELECT DISTINCT
@@ -119,8 +179,10 @@ FROM sales_staging;
 
 SELECT * FROM dim_date;
 ```
-...
-#### Príklad kódu 
+Táto dimenzia je typu SCD Typ 0, keďže dátumové údaje sú nemenné a v čase sa nemenia. Nové záznamy sa do dimenzie iba dopĺňajú.
+***
+#### Dimenzia času (dim_time)
+Dimenzia `dim_time` umožňuje analyzovať predaje podľa presného času objednávky. Z `ordertimestamp` boli odvodené atribúty ako hodina, minúta, sekunda a označenie AM/PM.
 ```sql
 CREATE OR REPLACE TABLE dim_time AS
 SELECT DISTINCT
@@ -137,8 +199,10 @@ FROM sales_staging s;
 
 SELECT * FROM dim_time;
 ```
-...
-#### Príklad kódu 
+Rovnako ako pri dimenzii dátumu ide o SCD Typ 0, pretože časové údaje sú statické a nemenia sa.
+***
+#### Dimenzia geografie (dim_geography)
+Dimenzia `dim_geography` bola vytvorená zo staging tabuľky `geography_staging` a obsahuje informácie o mieste predaja, ako sú mesto, štát, krajina a poštové smerovacie číslo. Každý geografický záznam je identifikovaný pomocou kľúča `geography_id`.
 ```sql
 CREATE OR REPLACE TABLE dim_geography AS
 SELECT DISTINCT
@@ -152,8 +216,10 @@ FROM geography_staging;
 
 SELECT * FROM dim_geography;
 ```
-...
-#### Príklad kódu 
+Dimenzia je navrhnutá ako SCD Typ 1, čo znamená, že prípadné zmeny geografických údajov by sa prepísali bez uchovávania historických hodnôt.
+***
+#### Dimenzia zákazníkov (dim_customers)
+Dimenzia `dim_customers` obsahuje základné informácie o zákazníkoch, napríklad demografické údaje, príjem, povolanie a priradenie k geografickej oblasti. Dáta pochádzajú zo staging tabuľky `customers_staging`.
 ```sql
 CREATE OR REPLACE TABLE dim_customers AS
 SELECT DISTINCT
@@ -177,8 +243,10 @@ FROM customers_staging;
 
 SELECT * FROM dim_customers;
 ```
-...
-#### Príklad kódu 
+Táto dimenzia je typu SCD Typ 1, keďže historické zmeny údajov o zákazníkoch (napr. zmena adresy) nie sú pre účely analýzy sledované a uchováva sa iba aktuálny stav.
+***
+#### Dimenzia produktov (dim_products)
+Dimenzia `dim_products` poskytuje informácie o bicykloch a ich vlastnostiach, ako sú názov produktu, farba, cena, veľkosť, hmotnosť, výrobný čas a kategória. Vznikla spojením staging tabuliek `products_staging` a `productsubcategory_staging`.
 ```sql
 CREATE OR REPLACE TABLE dim_products AS
 SELECT DISTINCT
@@ -206,8 +274,18 @@ JOIN productsubcategory_staging ps ON ps.productcategorykey = p.productsubcatego
 
 SELECT * FROM dim_products;
 ```
+Aj táto dimenzia je navrhnutá ako SCD Typ 1, pričom sa uchováva iba aktuálna verzia produktových údajov bez histórie zmien.
+***
+#### Faktová tabuľka predaja (fact_sales)
+Faktová tabuľka `fact_sales` reprezentuje jednotlivé položky objednávok (order lines) a tvorí centrálny prvok hviezdicového modelu. Každý záznam obsahuje cudzie kľúče na všetky dimenzie (`dim_date`, `dim_time`, `dim_customers`, `dim_products`, `dim_geography`) a zároveň hlavné metriky súvisiace s predajom.
 
-#### Príklad kódu 
+Primárnym kľúčom tabuľky je surrogate kľúč `sales_id`, ktorý bol vytvorený pomocou window function `ROW_NUMBER()`.
+
+Vo faktovej tabuľke sú použité aj povinné window functions:
+* výpočet celkovej hodnoty objednávky pomocou `SUM() OVER (PARTITION BY salesordernumber)`,
+* výpočet kumulatívnej hodnoty predaja zákazníka v čase pomocou `SUM() OVER (PARTITION BY customerkey ORDER BY orderdate)`.
+
+Tieto výpočty umožňujú pokročilé analytické pohľady na správanie zákazníkov a hodnotu objednávok.
 ```sql
 CREATE OR REPLACE TABLE fact_sales AS
 SELECT
@@ -248,7 +326,9 @@ JOIN dim_geography g ON g.geography_id = c.geography_id;
 
 SELECT * FROM fact_sales;
 ```
-...
+***
+#### Vyčistenie staging vrstvy
+Po úspešnom vytvorení dimenzií a faktovej tabuľky už staging tabuľky neboli ďalej potrebné. Z tohto dôvodu boli odstránené pomocou príkazov `DROP TABLE IF EXISTS`, čím sa optimalizovalo využitie úložiska v Snowflake.
 ```sql
 DROP TABLE IF EXISTS SALES_STAGING;
 DROP TABLE IF EXISTS PRODUCTS_STAGING;
