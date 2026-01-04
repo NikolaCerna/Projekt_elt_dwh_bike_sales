@@ -271,7 +271,7 @@ SELECT DISTINCT
     p.currentstock AS current_stock,
     ps.product_subcategory AS category
 FROM products_staging p
-JOIN productsubcategory_staging ps ON ps.productcategorykey = p.productsubcategorykey;
+JOIN productsubcategory_staging ps ON ps.productsubcategorykey = p.productsubcategorykey;
 
 
 SELECT * FROM dim_products;
