@@ -1,4 +1,4 @@
-#ELT proces datasetu AmazonBooks
+#ELT proces datasetu BikeSales
 
 ## 1. Úvod a popis zdrojových dát
 
