@@ -1,4 +1,6 @@
-# 1. Úvod a popis zdrojových dát
+#ELT proces datasetu AmazonBooks
+
+## 1. Úvod a popis zdrojových dát
 
 V tomto projekte sa venujeme analýze predaja bicyklov v rôznych časových obdobiach a geografických oblastiach. Zvolený dataset sme si vybrali najmä preto, že je prehľadný, ľahko pochopiteľný a vhodný na analýzu z pohľadu času, produktov aj regiónov.
 
@@ -114,7 +116,7 @@ Staging tabuľky:
 
 Tieto tabuľky obsahujú nezmenené (surové) dáta zo zdrojového datasetu. V tejto fáze nedochádza k žiadnym úpravám dát, ide len o presnú kópiu zdrojových tabuliek.
 
-#### Použité SQL príkazy:
+Použité SQL príkazy:
 ```sql
 CREATE OR REPLACE TABLE SALES_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."1_SALES";
