@@ -421,6 +421,15 @@ ORDER BY total_quantity_sold DESC;
 
 Dashboard poskytuje ucelený pohľad na predaj bicyklov z viacerých perspektív – časovej, produktovej, demografickej aj geografickej. Vizualizácie umožňujú rýchlu interpretáciu dát a slúžia ako základ pre ďalšiu analytickú prácu, reporting alebo rozhodovanie v oblasti predaja a marketingu.
 ***
+## 5. Zhrnutie
+
+
+V tomto projekte sme sa zamerali na spracovanie a analýzu predaja bicyklov pomocou ELT procesu v prostredí Snowflake. Zdrojové dáta pochádzali zo Snowflake Marketplace a boli spracované bez použitia externých súborov, priamo pomocou SQL príkazov.
+
+Po extrahovaní dát do staging tabuliek sme ich transformovali do dimenzionálneho modelu typu Star Schema, ktorý pozostáva z jednej faktovej tabuľky a viacerých dimenzií. Tento model umožňuje jednoduchú a prehľadnú analýzu predaja z rôznych pohľadov, napríklad podľa času, produktov, zákazníkov alebo regiónov.
+
+Na základe vytvoreného modelu boli navrhnuté vizualizácie, ktoré ukazujú vývoj tržieb v čase, sezónnosť predaja, najpredávanejšie produkty a rozdiely v nákupnom správaní zákazníkov. Vizualizácie pomáhajú lepšie pochopiť dáta a poskytujú základný prehľad o predaji bicyklov.
+***
 Autorky: Nikola Černá a Sára Dzurechová
 
 
