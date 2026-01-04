@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS BikeSales_DB.BikeSalesSchema;
 USE DATABASE BIKESALES_DB;
 USE SCHEMA BIKESALES_DB.BikeSalesSchema;
 
--- EXTRACT + LOAD
+//EXTRACT + LOAD
 
 CREATE OR REPLACE TABLE SALES_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."1_SALES";
@@ -35,7 +35,7 @@ SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."5_PRODUCT
 DESCRIBE TABLE PRODUCTSUBCATEGORY_STAGING;
 SELECT * FROM PRODUCTSUBCATEGORY_STAGING;
 
--- TRANSFORM
+//TRANSFORM 
 
 CREATE OR REPLACE TABLE dim_date AS
 SELECT DISTINCT
@@ -127,7 +127,7 @@ SELECT DISTINCT
     p.currentstock AS current_stock,
     ps.product_subcategory AS category
 FROM products_staging p
-JOIN productsubcategory_staging ps ON ps.productcategorykey = p.productsubcategorykey;
+JOIN productsubcategory_staging ps ON ps.productsubcategorykey = p.productsubcategorykey;
 
 
 SELECT * FROM dim_products;
@@ -170,10 +170,11 @@ JOIN dim_customers c ON c.customers_id = s.customerkey
 JOIN dim_products p ON p.products_id = s.productkey
 JOIN dim_geography g ON g.geography_id = c.geography_id;
 
-SELECT * FROM fact_sales;
+SELECT COUNT(*) FROM fact_sales;
 
 DROP TABLE IF EXISTS SALES_STAGING;
 DROP TABLE IF EXISTS PRODUCTS_STAGING;
 DROP TABLE IF EXISTS CUSTOMERS_STAGING;
 DROP TABLE IF EXISTS GEOGRAPHY_STAGING;
 DROP TABLE IF EXISTS PRODUCTSUBCATEGORY_STAGING;
+
