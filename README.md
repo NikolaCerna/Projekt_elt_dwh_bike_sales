@@ -57,7 +57,7 @@ Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na ent
 ...
 ...
 #### Kód:
-```
+```sql
 CREATE OR REPLACE TABLE SALES_STAGING AS
 SELECT * FROM BIKE_SALES__SAMPLE_DASHBOARD_SYNTHETIC_DATA.BIKES_SALES."1_SALES";
 
