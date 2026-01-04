@@ -1,4 +1,4 @@
-#ELT proces datasetu BikeSales
+# ELT proces datasetu BikeSales
 
 ## 1. Úvod a popis zdrojových dát
 
