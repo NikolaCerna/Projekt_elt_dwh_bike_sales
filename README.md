@@ -46,9 +46,11 @@ Surové dáta sú usporiadané v relačnom modeli, ktorý je znázornený na ent
 
 
 
-![Star Schema](img/star_schema.png)
+<div align="center">
+  <img src="img/star_schema.png" alt="Star Schema">
+  <p><i>Obrázok 2: Schéma hviezdy pre BikeSales</i></p>
+</div>
 
-*Obrázok 2 Schéma hviezdy pre BikeSales*
 ***
 ## 3. ELT proces v Snowflake
 ...
