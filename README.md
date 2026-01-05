@@ -362,15 +362,14 @@ GROUP BY d.month
 ORDER BY d.month;
 ```
 ***
-### Graf 2: Vývoj tržieb v čase (podľa rokov)
+### Graf 2: Tržby podľa roku a krajiny
 
-Táto vizualizácia zobrazuje celkové tržby z predaja bicyklov v jednotlivých rokoch. Slúži na sledovanie dlhodobého trendu vývoja predaja v čase.
-Graf umožňuje porovnať jednotlivé roky medzi sebou a identifikovať obdobia rastu alebo poklesu tržieb, čo môže súvisieť s dopytom, ekonomickou situáciou alebo zmenami v ponuke produktov.
+Graf zobrazuje vývoj celkových tržieb z predaja bicyklov v jednotlivých krajinách počas sledovaných rokov. Umožňuje porovnať výkonnosť geografických trhov a identifikovať krajiny s najväčším podielom na tržbách. Z vizualizácie je zrejmé, že tržby vo všetkých krajinách postupne rastú, pričom najvyšší objem predaja dosahujú Spojené štáty a Austrália, čo poukazuje na ich kľúčový význam pre celkové obchodné výsledky firmy.
 ```sql
-SELECT d.year, SUM(f.sales_amount) AS total_sales_amount FROM fact_sales f
+SELECT d.year, g.customer_country, SUM(f.sales_amount) AS total_sales FROM fact_sales f
 JOIN dim_date d ON f.date_id = d.date_id
-GROUP BY d.year
-ORDER BY d.year;
+JOIN dim_geography g ON f.geography_id = g.geography_id
+GROUP BY d.year, g.customer_country;
 ```
 ***
 ### Graf 3: Top 10 najpredávanejších produktov (podľa počtu kusov)
@@ -385,19 +384,35 @@ ORDER BY total_quantity DESC
 LIMIT 10;
 ```
 ***
-### Graf 4: Top 8 hodín s najvyšším počtom predaných kusov
+### Graf 4: Top 10 produktov podľa hrubej marže
 
-Tento graf znázorňuje, počas ktorých hodín v priebehu dňa dochádza k najvyššiemu počtu predaných produktov. Vizualizácia umožňuje analyzovať nákupné správanie zákazníkov z časového hľadiska.
-Z výsledkov je možné pozorovať, že predaj je koncentrovaný do určitých hodín dňa, čo môže súvisieť s pracovnou dobou alebo voľným časom zákazníkov.
+Tento graf znázorňuje desať produktov s najvyššou hrubou maržou, teda rozdielom medzi celkovými tržbami a nákladmi na predané produkty. Tento pohľad sa zameriava na ziskovosť produktov, nie len na ich predajný objem. Vizualizácia ukazuje, že najvyššiu maržu dosahujú vybrané modely bicyklov Mountain-200, čo naznačuje ich vysokú pridanú hodnotu a význam pre ziskovosť spoločnosti.
 ```sql
-SELECT t.hour, SUM(f.order_quantity) AS total_quantity_sold FROM fact_sales f
-JOIN dim_time t ON f.time_id = t.time_id
-GROUP BY t.hour
-ORDER BY total_quantity_sold DESC
-LIMIT 8;
+SELECT p.product_name, SUM(f.sales_amount) AS total_sales, SUM(f.total_product_cost) AS total_cost,
+ROUND(SUM(f.sales_amount) - SUM(f.total_product_cost),2) AS gross_margin FROM fact_sales f
+JOIN dim_products p ON f.products_id = p.products_id
+GROUP BY p.product_name
+ORDER BY gross_margin DESC
+LIMIT 10;
 ```
 ***
-### Graf 5: Predaj cestných bicyklov podľa pohlavia zákazníkov
+### Graf 5: Kumulatívne tržby v čase
+
+Graf zobrazuje kumulatívny vývoj tržieb v čase, pričom každá hodnota predstavuje súčet všetkých predchádzajúcich tržieb do daného dátumu. Vizualizácia umožňuje sledovať dlhodobý rast predaja bez krátkodobých výkyvov. Z grafu je viditeľný stabilný rast kumulatívnych tržieb, ktorý naznačuje postupné zvyšovanie celkovej výkonnosti firmy počas sledovaného obdobia.
+```sql
+WITH daily_sales AS (
+  SELECT
+    d.date AS sales_date,
+    SUM(f.sales_amount) AS daily_sales
+  FROM fact_sales f
+  JOIN dim_date d ON f.date_id = d.date_id
+  GROUP BY d.date
+)
+SELECT sales_date, SUM(ROUND(daily_sales)) OVER (ORDER BY sales_date) AS cumulative_sales FROM daily_sales
+ORDER BY sales_date;
+```
+***
+### Graf 6: Predaj cestných bicyklov podľa pohlavia zákazníkov
 
 Graf porovnáva počet predaných cestných bicyklov medzi jednotlivými pohlaviami zákazníkov. Umožňuje analyzovať, či existujú rozdiely v preferenciách medzi mužmi a ženami pri tomto type produktu.
 Vizualizácia ukazuje, že cestné bicykle sú obľúbené u oboch pohlaví, pričom rozdiely v počte predaných kusov nie sú výrazné.
@@ -407,17 +422,6 @@ JOIN dim_customers c ON f.customers_id = c.customers_id
 JOIN dim_products p ON p.products_id=f.products_id
 WHERE p.category LIKE 'Road Bikes'
 GROUP BY c.gender
-ORDER BY total_quantity_sold DESC;
-```
-***
-### Graf 6: Počet predaných produktov podľa krajín
-
-Táto vizualizácia zobrazuje rozdelenie predaja bicyklov podľa krajín. Umožňuje porovnať jednotlivé geografické oblasti a identifikovať regióny s najvyšším dopytom po bicykloch.
-Graf poskytuje prehľad o tom, v ktorých krajinách sa bicykle predávajú najviac a kde má predaj najväčší potenciál.
-```sql
-SELECT  g.customer_country, SUM(f.order_quantity) AS total_quantity_sold FROM fact_sales f
-JOIN dim_geography g ON f.geography_id = g.geography_id
-GROUP BY g.customer_country
 ORDER BY total_quantity_sold DESC;
 ```
 
