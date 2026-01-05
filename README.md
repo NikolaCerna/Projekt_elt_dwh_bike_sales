@@ -6,7 +6,7 @@ V tomto projekte sa venujeme analýze predaja bicyklov v rôznych časových obd
 
 Dáta zachytávajú celý proces predaja bicyklov – od jednotlivých predajných záznamov až po informácie o produktoch, zákazníkoch, miestach predaja a finančných ukazovateľoch. Vďaka tomu je možné sledovať vývoj predaja, porovnávať úspešnosť jednotlivých produktov a analyzovať rozdiely medzi regiónmi.
 
-Dataset obsahuje viacero typov údajov, konkrétne časové údaje (dátum predaja), produktové údaje (typ a kategória bicykla), geografické údaje (miesto predaja) a číselné údaje, ako sú tržby, množstvo predaných kusov a zisk.
+Dataset obsahuje viacero typov údajov, konkrétne časové údaje (dátum predaja), produktové údaje (typ a kategória bicykla), geografické údaje (miesto predaja) a číselné údaje, ako sú tržby, množstvo predaných kusov a údaje potrebné na výpočet zisku.
 
 Cieľom analýzy je najmä:
 * sledovať, ako sa predaj bicyklov vyvíja v čase,
@@ -20,7 +20,7 @@ Dataset zahŕňa tieto tabuľky:
 * `SALES` – obsahuje záznamy o jednotlivých predajoch vrátane dátumu, produktu, zákazníka, regiónu, množstva a finančných ukazovateľov. Táto tabuľka slúži ako základ pre faktovú tabuľku.
 * `PRODUCTS` – obsahuje informácie o bicykloch, ako sú názov, kategória a ďalšie vlastnosti. Je zdrojom pre dimenziu produktov.
 * `CUSTOMERS` – zahŕňa základné informácie o zákazníkoch a slúži na vytvorenie dimenzie zákazníkov.
-* `GEOGRAPHY` – obsahuje geografické údaje o miestach predaja (napríklad mestá a krajiny), ktoré sú použité v dimenzii geografie.
+* `GEOGRAPHY` – obsahuje geografické údaje o zákazníkoch (napríklad mesto, štát a krajinu), ktoré sú použité na analytické rozdelenie predajov podľa regiónov.
 * `PRODUCTSUBCATEGORY` – obsahuje produktové kategórie, ktoré rozširujú informácie v produktovej dimenzii.
 
 Úlohou ELT procesu je tieto dáta prevziať zo Snowflake Marketplace, následne ich transformovať do dimenzionálneho modelu typu hviezda a pripraviť ich na analytické spracovanie a vizualizáciu z rôznych uhlov pohľadu.
@@ -408,7 +408,7 @@ WITH daily_sales AS (
   JOIN dim_date d ON f.date_id = d.date_id
   GROUP BY d.date
 )
-SELECT sales_date, SUM(ROUND(daily_sales)) OVER (ORDER BY sales_date) AS cumulative_sales FROM daily_sales
+SELECT sales_date, ROUND(SUM(daily_sales)) OVER (ORDER BY sales_date) AS cumulative_sales FROM daily_sales
 ORDER BY sales_date;
 ```
 ***
